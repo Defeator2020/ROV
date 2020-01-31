@@ -44,11 +44,6 @@ void loop() {
 
     // Look for the newline. That marks the end of the sentence
     if (Serial.read() == '\n') {
-      // Constrain the thruster/servo values to 0 - 180 (sanity check on values / erroneous command protection)
-      pos1 = constrain(pos1, 0, 180);
-      pos2 = constrain(pos2, 0, 180);
-      pos3 = constrain(pos3, 0, 180);
-  
       if (peripheralControl == 0) {
         // Write the servo position(s) to the servo(s)
         thrusterL.write(pos1);
