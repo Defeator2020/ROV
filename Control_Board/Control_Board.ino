@@ -73,7 +73,7 @@ void loop() {
   } else if (digitalRead(11) == LOW) { // SHOULD THE LED CONTROL JUST BE PART OF THE CAMERA OPERATIONS? OR WILL VERTICAL CONTROL NEED TO BE ON THE TRIGGERS THEN?
     getJoystickValues();
 
-    valueL = constrain(joyy,-1,1); // APPLY BUFFERING AND WHATNOT - CALCULATIONS DONE HERE OR ONBOARD?
+    valueL = constrain(joyy,-1,1);
     valueR = 0;
     
     peripheralControl = 2;
@@ -117,7 +117,7 @@ void getJoystickValues() {
     joyy = 0;
   }
   
-  // Constrain joystick range to -90 - 90 (BE WEARY OF THIS -> MIGHT WRAP AROUND. NEED TO FIX THAT)
+  // Constrain joystick range to -90 - 90
   joyx = constrain(joyx, -90, 90);
   joyy = constrain(joyy, -90, 90);
 }
