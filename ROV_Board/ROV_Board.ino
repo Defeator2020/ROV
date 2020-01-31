@@ -17,7 +17,7 @@ float cameraRate = 1; // Rate adjust for thruster commands while in camera mode,
 // Create variables to manage the LED conditions and logic
 const int ledPin = 4;    // LED connected to digital pin 9
 float ledValue = 180; // LED is inverted from usual
-const int ledMax = 255; // 0 - 255 (WRITE COMMAND TO USE SERIAL TO FIND ABSOLUTE MAX / MIN VALUES FOR THIS)
+const int ledMax = 255; // 0 - 255
 const int ledMin = 0; // 0 - 255 (")
 
 void setup() {
