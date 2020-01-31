@@ -76,6 +76,9 @@ void loop() {
         analogWrite(ledPin, ledValue);
         delay(10);
         
+      } else if (peripheralControl == 2) {
+        // PUT CODE FOR MANIPULATOR / SAMPLING INSTRUMENTS HERE
+        
       } else { // TEMPORARY ERROR STATE - NO THRUSTERS, CAMERA CENTERED
         thrusterL.write(90); // VERIFY THAT THIS REALLY IS 0% (NEUTRAL) THROTTLE
         thrusterR.write(90);
