@@ -5,9 +5,9 @@
 float joyx, joyy, zbut, cbut;
 
 // Create variables to store the various motor and servo states and turning / rate parameters
-int valueL = 0; // DO THESE VALUES NEED TO BE + AND - (remove the "+= 90" bits), OR ALL + (leave those operations)?????
-int valueR = 0;
-int valueV = 0;
+int pos1 = 0; // DO THESE VALUES NEED TO BE + AND - (remove the "+= 90" bits), OR ALL + (leave those operations)?????
+int pos2 = 0;
+int pos3 = 0;
 int pivotSpeed; // Pivot Speed (-90 - 90)
 float pivotScale; // Balance scale between drive (turn) and pivot (0 - 1)
 float pivotYlimit = 23; // The threshold where pivoting begins, in units of the distance on the y-axis from the x-axis. Higher = more range maps to pivoting (0 - 90)
@@ -62,32 +62,33 @@ void loop() {
   } else if (digitalRead(10) == LOW) {
     getJoystickValues();
 
-    valueL = joyx;
-    valueR = joyy;
+    pos1 = joyx;
+    pos2 = joyy;
     
     // Convert the positions back into the servo(and ESC)-friendly range of (0 - 180)
-    valueR += 90;
+    pos2 += 90;
     
     if (cbut == 1 && zbut == 0) {
-      valueV = 1;
+      pos3 = 1;
     } else if (cbut == 0 && zbut == 1) {
-      valueV = -1;
+      pos3 = -1;
     } else {
-      valueV = 0;
+      pos3 = 0;
     }
     
     peripheralControl = 1;
   } else {
-    valueL = 90; // WHAT SHOULD I DO HERE? - TEMPORARY ERROR CODE
-    valueR = 90;
+    pos1 = 90;
+    pos2 = 90;
+    pos3 = 90;
   }
   
   // Send those values over serial
-  Serial.print(valueL);
+  Serial.print(pos1);
   Serial.print(",");
-  Serial.print(valueR);
+  Serial.print(pos2);
   Serial.print(",");
-  Serial.print(valueV);
+  Serial.print(pos3);
   Serial.print(",");
   Serial.print(peripheralControl);
   Serial.print("\n");
@@ -126,13 +127,13 @@ void adjustMotorRange() {
   // Calculate the new maximum and minimum (range extents) for the values to be sent to the ESC
   int rangeAdjust = thrusterMaxValue - thrusterMinValue;
   rangeAdjust = (rangeAdjust / 180);
-  valueL *= rangeAdjust; // Adjust the thruster values by the calculated adjustment factor
-  valueR *= rangeAdjust;
-  valueV *= rangeAdjust;
+  pos1 *= rangeAdjust; // Adjust the thruster values by the calculated adjustment factor
+  pos2 *= rangeAdjust;
+  pos3 *= rangeAdjust;
   
-  valueL += 90; // Move the adjusted values up into the (0 - 180) range
-  valueR += 90;
-  valueV += 90;
+  pos1 += 90; // Move the adjusted values up into the (0 - 180) range
+  pos2 += 90;
+  pos3 += 90;
   
 }
 
@@ -140,25 +141,25 @@ void calculateThrusters() {
   // Calculate DRIVE TURN output, based on X input
   if (joyy >= 0) { // We are going FORWARD
     if (joyx >= 0) {
-      valueL = 90;
-      valueR = 90 - joyx;
+      pos1 = 90;
+      pos2 = 90 - joyx;
     } else {
-      valueL = 90 + joyx;
-      valueR = 90;
+      pos1 = 90 + joyx;
+      pos2 = 90;
     }
   } else { // We are going BACKWARD
     if (joyx >= 0) {
-      valueL = 90 - joyx;
-      valueR = 90;
+      pos1 = 90 - joyx;
+      pos2 = 90;
     } else {
-      valueL = 90;
-      valueR = 90 + joyx;
+      pos1 = 90;
+      pos2 = 90 + joyx;
     }
   }
 
   // Scale DRIVE output, based on Y input ('throttle')
-  valueL = valueL * (joyy/90);
-  valueR = valueR * (joyy/90);
+  pos1 = pos1 * (joyy/90);
+  pos2 = pos2 * (joyy/90);
 
   // Calculate PIVOT amount (strength based on X input, blending based on Y input)
   pivotSpeed = joyx;
@@ -169,20 +170,20 @@ void calculateThrusters() {
   }
 
   // Finalize mix of DRIVE (TURN) and PIVOT
-  valueL = (1 - pivotScale) * valueL + pivotScale * (pivotSpeed);
-  valueR = (1 - pivotScale) * valueR + pivotScale * (-pivotSpeed);
+  pos1 = (1 - pivotScale) * pos1 + pivotScale * (pivotSpeed);
+  pos2 = (1 - pivotScale) * pos2 + pivotScale * (-pivotSpeed);
 
-  // Calculate 3rd motor value (valueV)
+  // Calculate 3rd motor value (pos3)
   if (cbut == 1 && zbut == 0) {
-    valueV = 90; // FIGURE OUT WHAT VERTICAL RATES SHOULD BE, AND ADJUST LIMITS HERE
+    pos3 = 90; // FIGURE OUT WHAT VERTICAL RATES SHOULD BE, AND ADJUST LIMITS HERE
   } else if (cbut == 0 && zbut == 1) {
-    valueV = -90;
+    pos3 = -90;
   } else {
-    valueV = 0;
+    pos3 = 0;
   }
 
   // Adjust values based on current rate setting
-  valueL = valueL * ratePercent;
-  valueR = valueR * ratePercent;
-  valueV = valueV * ratePercent;
+  pos1 = pos1 * ratePercent;
+  pos2 = pos2 * ratePercent;
+  pos3 = pos3 * ratePercent;
 }
