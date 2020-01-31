@@ -51,13 +51,16 @@ void loop() {
         thrusterV.write(pos3);
         
       } else if (peripheralControl == 1) {
-        tiltCamera.write(pos2);
         
-      } else if (peripheralControl == 2) {
-        pos1 = constrain(pos1,-1,1); // WILL CHANGING THIS VALUE (pos1) HERE MESS ANYTHING UP? DO I NEED TO MAKE A NEW VARIABLE JUST FOR THIS CALCULATION?
-        ledValue += pos1 * -1; // -1 is needed because the PWM controller is inverted (255(ish) = min, 0(ish) = max)
-        ledValue = constrain(ledValue, ledMin, ledMax);
+        
+        // Drive camera tilt mechanism - SHOULD THIS HOLD, AND ADJUST, OR RETURN TO NEUTRAL?
+        tiltCamera.write(pos2);
 
+        // Convert vertical value for use as LED control
+        pos3 = constrain(pos3, -1, 1);
+        
+        ledValue += pos3 * -1; // // -1 is needed because the PWM controller is inverted (255(ish) = min, 0(ish) = max)
+        ledValue = constrain(ledValue, ledMin, ledMax);
         analogWrite(ledPin, ledValue);
         delay(10);
         

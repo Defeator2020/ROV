@@ -1,4 +1,4 @@
-int ledPin = 9;    // LED connected to digital pin 9
+int ledPin = 9; // LED connected to digital pin 9
 float ledValue = 180; // LED is inverted from usual
 
 int value = 100;

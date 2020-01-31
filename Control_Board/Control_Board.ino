@@ -68,15 +68,16 @@ void loop() {
     // Convert the positions back into the servo-friendly range of (0 - 180)
     valueL += 90;
     valueR += 90;
+
+    if (cbut == 1 && zbut == 0) {
+      valueV = 90; // FIGURE OUT WHAT VERTICAL RATES SHOULD BE, AND ADJUST LIMITS HERE
+    } else if (cbut == 0 && zbut == 1) {
+      valueV = -90;
+    } else {
+      valueV = 0;
+    }
     
     peripheralControl = 1;
-  } else if (digitalRead(11) == LOW) { // SHOULD THE LED CONTROL JUST BE PART OF THE CAMERA OPERATIONS? OR WILL VERTICAL CONTROL NEED TO BE ON THE TRIGGERS THEN?
-    getJoystickValues();
-
-    valueL = constrain(joyy,-1,1);
-    valueR = 0;
-    
-    peripheralControl = 2;
   } else {
     valueL = 90; // WHAT SHOULD I DO HERE? - TEMPORARY ERROR CODE
     valueR = 90;
@@ -178,7 +179,7 @@ void calculateThrusters() {
   } else if (cbut == 0 && zbut == 1) {
     valueV = -90;
   } else {
-    valueV = 0; // IS THIS REALLY NEEDED?
+    valueV = 0;
   }
 
   // Adjust values based on current rate setting
