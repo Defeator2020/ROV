@@ -12,6 +12,8 @@ int pos2 = 90;
 int pos3 = 90;
 int peripheralControl = 0;
 
+float cameraRate = 1; // Rate adjust for thruster commands while in camera mode, in percent (0 - 1).
+
 // Create variables to manage the LED conditions and logic
 const int ledPin = 4;    // LED connected to digital pin 9
 float ledValue = 180; // LED is inverted from usual
@@ -51,7 +53,17 @@ void loop() {
         thrusterV.write(pos3);
         
       } else if (peripheralControl == 1) {
-        
+        // Use x-axis to control pivoting in camera mode
+        if (pos1 < 0) { // RELIES ON -90 - 90 RANGE. CHANGE THIS IF THAT PARADIGM CHANGES
+          thrusterL.write(pos1 * cameraRate);
+          thrusterR.write(-pos1 * cameraRate);
+        } else if (pos1 > 0) {
+          thrusterL.write(pos1 * cameraRate);
+          thrusterR.write(-pos1 * cameraRate);
+        } else {
+          thrusterL.write(90);
+          thrusterR.write(90);
+        }
         
         // Drive camera tilt mechanism - SHOULD THIS HOLD, AND ADJUST, OR RETURN TO NEUTRAL?
         tiltCamera.write(pos2);

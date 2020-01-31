@@ -65,14 +65,13 @@ void loop() {
     valueL = joyx;
     valueR = joyy;
     
-    // Convert the positions back into the servo-friendly range of (0 - 180)
-    valueL += 90;
+    // Convert the positions back into the servo(and ESC)-friendly range of (0 - 180)
     valueR += 90;
-
+    
     if (cbut == 1 && zbut == 0) {
-      valueV = 90; // FIGURE OUT WHAT VERTICAL RATES SHOULD BE, AND ADJUST LIMITS HERE
+      valueV = 1;
     } else if (cbut == 0 && zbut == 1) {
-      valueV = -90;
+      valueV = -1;
     } else {
       valueV = 0;
     }
