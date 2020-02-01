@@ -6,7 +6,7 @@ Servo thruster;
 float joyy;
 
 void setup() {
-  thruster.attach(8,1000,2000);
+  thruster.attach(8,700,2000);
 
   // Initialize Nunchuck
   nunchuck_setpowerpins();
@@ -16,10 +16,6 @@ void setup() {
 void loop() {
   nunchuck_get_data();
   joyy = nunchuck_joyy();     //  29 - 229
-
-  joyy = (joyy / 1.1) - 27;
-
-  joyy = constrain(joyy, 0, 180);
 
   thruster.write(joyy);
 }
