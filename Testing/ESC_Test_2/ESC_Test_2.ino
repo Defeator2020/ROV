@@ -4,6 +4,8 @@
 
 Servo thruster;
 float joyy;
+int thrusterMinValue = 40;
+int thrusterMaxValue = 140;
 
 void setup() {
   thruster.attach(8,700,2000);
@@ -16,6 +18,9 @@ void setup() {
 void loop() {
   nunchuck_get_data();
   joyy = nunchuck_joyy();     //  29 - 229
+  joyy = (joyy / 1.1) - 27;
+
+  
 
   thruster.write(joyy);
 }

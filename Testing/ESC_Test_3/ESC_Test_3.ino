@@ -1,20 +1,22 @@
+#include <Servo.h>
 #include <Wire.h>
 #include <nunchuck_funcs.h>
 
 // Initialize variables for storing the Nunchuck's state
 float joyx, joyy, zbut, cbut;
 
+Servo thruster;
+
 // Create variables to store the various motor and servo states and turning / rate parameters
 int pos1 = 0; // DO THESE VALUES NEED TO BE + AND - (remove the "+= 90" bits), OR ALL + (leave those operations)?????
 int pos2 = 0;
-int pos3 = 0;
 int pivotSpeed; // Pivot Speed (-90 - 90)
 float pivotScale; // Balance scale between drive (turn) and pivot (0 - 1)
 float pivotYlimit = 23; // The threshold where pivoting begins, in units of the distance on the y-axis from the x-axis. Higher = more range maps to pivoting (0 - 90)
 
 float ratePercent = 1; // Adjusts speed of motors based on rotary selector position (0 - 1)
-int thrusterMinValue = 40; // Sets minimum throttle level for ESC - REMEMBER TO SET PRIOR TO TESTING (0 - 180)
-int thrusterMaxValue = 140; // Sets maximum throttle level for ESC - REMEMBER TO SET PRIOR TO TESTING (0 - 180)
+int thrusterMinValue = 0; // Sets minimum throttle level for ESC - REMEMBER TO SET PRIOR TO TESTING (0 - 180)
+int thrusterMaxValue = 180; // Sets maximum throttle level for ESC - REMEMBER TO SET PRIOR TO TESTING (0 - 180)
 
 int peripheralControl = 0; // Tells the ROV's Arduino if the values are for the thrusters or for an accessory (0=thrusters, 1=camera, 2=lights)
 
@@ -23,75 +25,18 @@ void setup() {
   nunchuck_setpowerpins();
   nunchuck_init(); // send the initilization handshake
 
-  // Set pins connected to rotary selector to inputs
-  pinMode(8, INPUT_PULLUP);
-  pinMode(9, INPUT_PULLUP);
-  pinMode(10, INPUT_PULLUP);
-  pinMode(11, INPUT_PULLUP);
-
-  // Set output pin for enabling RS485 transmit
-  pinMode(7, OUTPUT);
-  pinMode(6, OUTPUT); // DELETE ONCE JUMPERED
-
-  // Set to only transmit on this end - REMOVE IF RECEIPT OF INFORMATION IS NECESSARY
-  digitalWrite(7, HIGH);
-  digitalWrite(6, HIGH); // DELETE ONCE JUMPERED
-  
-  // Open serial connection
-  Serial.begin(9600);
+  thruster.attach(8,700,2000);
 }
 
 void loop() {
-  peripheralControl = 0;
-  
-  // Check rotary selector position
-  if (digitalRead(8) == LOW) {
-    ratePercent = 1;
-    getJoystickValues();
-    calculateThrusters();
-
-    adjustMotorRange();
-    // Convert the positions back into the motor-friendly range
-  } else if (digitalRead(9) == LOW) {
     ratePercent = .5;
     getJoystickValues();
     calculateThrusters();
-
     adjustMotorRange();
-    // Convert the positions back into the motor-friendly range
-  } else if (digitalRead(10) == LOW) {
-    getJoystickValues();
 
-    pos1 = joyx;
-    pos2 = joyy;
-    
-    // Convert the positions back into the servo(and ESC)-friendly range of (0 - 180)
-    pos2 += 90;
-    
-    if (cbut == 1 && zbut == 0) {
-      pos3 = 1;
-    } else if (cbut == 0 && zbut == 1) {
-      pos3 = -1;
-    } else {
-      pos3 = 0;
-    }
-    
-    peripheralControl = 1;
-  } else {
-    pos1 = 90;
-    pos2 = 90;
-    pos3 = 90;
-  }
   
   // Send those values over serial
-  Serial.print(pos1);
-  Serial.print(",");
-  Serial.print(pos2);
-  Serial.print(",");
-  Serial.print(pos3);
-  Serial.print(",");
-  Serial.print(peripheralControl);
-  Serial.print("\n");
+  thruster.write(pos1);
 }
 
 void getJoystickValues() {
@@ -99,8 +44,6 @@ void getJoystickValues() {
   nunchuck_get_data();
   joyx = nunchuck_joyx();     //  15 - 221
   joyy = nunchuck_joyy();     //  29 - 229
-  zbut = nunchuck_zbutton();     //  0 - 1
-  cbut = nunchuck_cbutton();     //  0 - 1
 
   // Adjust joystick range to -90 - 90
   joyx = (joyx / 1.1) - 23;
@@ -129,11 +72,9 @@ void adjustMotorRange() {
   rangeAdjust = (rangeAdjust / 180);
   pos1 *= rangeAdjust; // Adjust the thruster values by the calculated adjustment factor
   pos2 *= rangeAdjust;
-  pos3 *= rangeAdjust;
   
   pos1 += 90; // Move the adjusted values up into the (0 - 180) range
   pos2 += 90;
-  pos3 += 90;
   
 }
 
@@ -173,17 +114,7 @@ void calculateThrusters() {
   pos1 = (1 - pivotScale) * pos1 + pivotScale * (pivotSpeed);
   pos2 = (1 - pivotScale) * pos2 + pivotScale * (-pivotSpeed);
 
-  // Calculate 3rd motor value (pos3)
-  if (cbut == 1 && zbut == 0) {
-    pos3 = 90; // FIGURE OUT WHAT VERTICAL RATES SHOULD BE, AND ADJUST LIMITS HERE
-  } else if (cbut == 0 && zbut == 1) {
-    pos3 = -90;
-  } else {
-    pos3 = 0;
-  }
-
   // Adjust values based on current rate setting
   pos1 = pos1 * ratePercent;
   pos2 = pos2 * ratePercent;
-  pos3 = pos3 * (ratePercent * .5); // Vertical thruster set to run at half the speed of the other ones
 }
