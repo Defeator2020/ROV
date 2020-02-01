@@ -22,17 +22,11 @@ const int ledMin = 0; // 0 - 255 (")
 
 void setup() {
   // Attach the thrusters and servos to their respective pins
-  thrusterL.attach(5);
-  thrusterR.attach(6);
-  thrusterV.attach(7);
-  tiltCamera.attach(8);
+  thrusterL.attach(5,700,2000);
+  thrusterR.attach(6,700,2000);
+  thrusterV.attach(7,700,2000);
+  tiltCamera.attach(8,700,2000);
 
-  // Perform ESC handshake(s) - CURRENTLY ONLY LEFT THRUSTER (PIN 5)
-  thrusterL.write(140);
-  delay(4000);
-  thrusterL.write(40);
-  delay(4000);
-  
   Serial.begin(9600); // Initialize serial communication
 }
 
