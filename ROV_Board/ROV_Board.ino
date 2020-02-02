@@ -12,22 +12,28 @@ int pos2 = 90;
 int pos3 = 90;
 int peripheralControl = 0;
 
-float cameraRate = 1; // Rate adjust for thruster commands while in camera mode, in percent (0 - 1).
+float cameraRate = .125; // Rate adjust for thruster commands while in camera mode, in percent (0 - 1).
+int thrusterNeutral = 90; // Identifies the neutral point for all thrusters, and will return to this value if anything erroneous happens
 
 // Create variables to manage the LED conditions and logic
 const int ledPin = 4;    // LED connected to digital pin 9
 float ledValue = 180; // LED is inverted from usual
 const int ledMax = 255; // 0 - 255
-const int ledMin = 0; // 0 - 255 (")
+const int ledMin = 0; // 0 - 255
 
 void setup() {
   // Attach the thrusters and servos to their respective pins
   thrusterL.attach(5,700,2000);
   thrusterR.attach(6,700,2000);
   thrusterV.attach(7,700,2000);
-  tiltCamera.attach(8,700,2000);
+  tiltCamera.attach(8);
 
   Serial.begin(9600); // Initialize serial communication
+
+  thrusterL.write(thrusterNeutral); // Sets all thrusters to their neutral points
+  thrusterR.write(thrusterNeutral);
+  thrusterV.write(thrusterNeutral);
+  tiltCamera.write(90); // Centers the camera vertically - FIGURE OUT WHAT VALUE THIS NEEDS TO BE< AND ADJUST STUFF ACCORDINGLY (MAKE THIS NEUTRAL JOYSTICK, TOO)
 }
 
 void loop() {
@@ -48,15 +54,17 @@ void loop() {
         
       } else if (peripheralControl == 1) {
         // Use x-axis to control pivoting in camera mode
-        if (pos1 < 0) { // RELIES ON -90 - 90 RANGE. CHANGE THIS IF THAT PARADIGM CHANGES
-          thrusterL.write(pos1 * cameraRate);
-          thrusterR.write(-pos1 * cameraRate);
-        } else if (pos1 > 0) {
-          thrusterL.write(pos1 * cameraRate);
-          thrusterR.write(-pos1 * cameraRate);
+        if (pos1 < 90) {
+          pos1 = (pos1 - 90) * cameraRate;
+          thrusterL.write(pos1);
+          thrusterR.write(-pos1);
+        } else if (pos1 > 90) {
+          pos1 = (pos1 - 90) * cameraRate;
+          thrusterL.write(pos1);
+          thrusterR.write(-pos1);
         } else {
           thrusterL.write(90);
-          thrusterR.write(90);
+          thrusterR.write(90); // MAKE DEFAULT VARIABLE
         }
         
         // Drive camera tilt mechanism - SHOULD THIS HOLD, AND ADJUST, OR RETURN TO NEUTRAL?
@@ -65,7 +73,7 @@ void loop() {
         // Convert vertical value for use as LED control
         pos3 = constrain(pos3, -1, 1);
         
-        ledValue += pos3 * -1; // // -1 is needed because the PWM controller is inverted (255(ish) = min, 0(ish) = max)
+        ledValue += -pos3; // // - is needed because the PWM controller is inverted (255(ish) = min, 0(ish) = max)
         ledValue = constrain(ledValue, ledMin, ledMax);
         analogWrite(ledPin, ledValue);
         delay(10);
@@ -73,12 +81,15 @@ void loop() {
       } else if (peripheralControl == 2) {
         // PUT CODE FOR MANIPULATOR / SAMPLING INSTRUMENTS HERE
         
-      } else { // TEMPORARY ERROR STATE - NO THRUSTERS, CAMERA CENTERED
-        thrusterL.write(90); // VERIFY THAT THIS REALLY IS 0% (NEUTRAL) THROTTLE
-        thrusterR.write(90);
-        thrusterV.write(90);
-        tiltCamera.write(90);
+      } else { // Error state - zero all thrusters
+        thrusterL.write(thrusterNeutral);
+        thrusterR.write(thrusterNeutral);
+        thrusterV.write(thrusterNeutral);
       }
+    } else { // Error state - zero all thrusters
+      thrusterL.write(thrusterNeutral);
+      thrusterR.write(thrusterNeutral);
+      thrusterV.write(thrusterNeutral);
     }
   }
 }

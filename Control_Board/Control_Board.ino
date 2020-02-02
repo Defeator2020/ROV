@@ -13,10 +13,10 @@ float pivotScale; // Balance scale between drive (turn) and pivot (0 - 1)
 float pivotYlimit = 23; // The threshold where pivoting begins, in units of the distance on the y-axis from the x-axis. Higher = more range maps to pivoting (0 - 90)
 
 float ratePercent = 1; // Adjusts speed of motors based on rotary selector position (0 - 1)
-int thrusterMinValue = 40; // Sets minimum throttle level for ESC - REMEMBER TO SET PRIOR TO TESTING (0 - 180)
-int thrusterMaxValue = 140; // Sets maximum throttle level for ESC - REMEMBER TO SET PRIOR TO TESTING (0 - 180)
+int thrusterMinValue = 0; // Sets minimum throttle level for ESC - REMEMBER TO SET PRIOR TO TESTING (0 - 180)
+int thrusterMaxValue = 180; // Sets maximum throttle level for ESC - REMEMBER TO SET PRIOR TO TESTING (0 - 180)
 
-int peripheralControl = 0; // Tells the ROV's Arduino if the values are for the thrusters or for an accessory (0=thrusters, 1=camera, 2=lights)
+int peripheralControl = 0; // Tells the ROV's Arduino if the values are for the thrusters or for an accessory (0=thrusters, 1=camera, 2=misc)
 
 void setup() {
   // Initialize Nunchuck
@@ -46,14 +46,14 @@ void loop() {
   
   // Check rotary selector position
   if (digitalRead(8) == LOW) {
-    ratePercent = 1;
+    ratePercent = .5;
     getJoystickValues();
     calculateThrusters();
 
     adjustMotorRange();
     // Convert the positions back into the motor-friendly range
   } else if (digitalRead(9) == LOW) {
-    ratePercent = .5;
+    ratePercent = .25;
     getJoystickValues();
     calculateThrusters();
 
@@ -66,6 +66,7 @@ void loop() {
     pos2 = joyy;
     
     // Convert the positions back into the servo(and ESC)-friendly range of (0 - 180)
+    pos1 += 90;
     pos2 += 90;
     
     if (cbut == 1 && zbut == 0) {
@@ -80,7 +81,7 @@ void loop() {
   } else {
     pos1 = 90;
     pos2 = 90;
-    pos3 = 90;
+    pos3 = 0;
   }
   
   // Send those values over serial
@@ -175,9 +176,9 @@ void calculateThrusters() {
 
   // Calculate 3rd motor value (pos3)
   if (cbut == 1 && zbut == 0) {
-    pos3 = 90; // FIGURE OUT WHAT VERTICAL RATES SHOULD BE, AND ADJUST LIMITS HERE
+    pos3 = 45; // FIGURE OUT WHAT VERTICAL RATES SHOULD BE, AND ADJUST LIMITS HERE -- MAYBE BIND TO A VARIABLE UP TOP
   } else if (cbut == 0 && zbut == 1) {
-    pos3 = -90;
+    pos3 = -45;
   } else {
     pos3 = 0;
   }
