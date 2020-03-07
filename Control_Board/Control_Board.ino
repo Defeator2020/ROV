@@ -5,7 +5,7 @@
 float joyx, joyy, zbut, cbut;
 
 // Create variables to store the various motor and servo states and turning / rate parameters
-int pos1 = 0; // DO THESE VALUES NEED TO BE + AND - (remove the "+= 90" bits), OR ALL + (leave those operations)?????
+int pos1 = 0;
 int pos2 = 0;
 int pos3 = 0;
 int pivotSpeed; // Pivot Speed (-90 - 90)
