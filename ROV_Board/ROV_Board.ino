@@ -74,7 +74,7 @@ void loop() {
           thrusterR.write(90); // MAKE DEFAULT VARIABLE
         }
         
-        // Drive camera tilt mechanism - SHOULD THIS HOLD, AND ADJUST, OR RETURN TO NEUTRAL?
+        // Drive camera tilt mechanism
         tiltCamera.write(pos2);
 
         // Convert vertical value for use as LED control
