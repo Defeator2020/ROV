@@ -1,3 +1,4 @@
+#include <Wire.h>
 #include <Servo.h>
 
 // Create servo objects to control everything (servos + ESCs)
@@ -28,8 +29,14 @@ void setup() {
   thrusterV.attach(7,700,2000);
   tiltCamera.attach(8);
 
-  Serial.begin(9600); // Initialize serial communication
+  // Set output pin for enabling RS485 transmit
+  pinMode(7, OUTPUT);
 
+  Serial.begin(9600); // Initialize serial communication
+  
+  // Set serial board to low (receive)
+  digitalWrite(7, LOW);
+  
   thrusterL.write(thrusterNeutral); // Sets all thrusters to their neutral points
   thrusterR.write(thrusterNeutral);
   thrusterV.write(thrusterNeutral);

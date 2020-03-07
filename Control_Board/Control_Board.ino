@@ -31,14 +31,12 @@ void setup() {
 
   // Set output pin for enabling RS485 transmit
   pinMode(7, OUTPUT);
-  pinMode(6, OUTPUT); // DELETE ONCE JUMPERED
-
-  // Set to only transmit on this end - REMOVE IF RECEIPT OF INFORMATION IS NECESSARY
-  digitalWrite(7, HIGH);
-  digitalWrite(6, HIGH); // DELETE ONCE JUMPERED
   
   // Open serial connection
   Serial.begin(9600);
+  
+  // Set serial board to low (receive)
+  digitalWrite(7, LOW);
 }
 
 void loop() {
@@ -84,6 +82,13 @@ void loop() {
     pos3 = 0;
   }
   
+	transmitData();
+}
+
+void transmitData() { // Transmit data to the vehicle over serial
+  // Set high to transmit
+  digitalWrite(7, HIGH);
+  
   // Send those values over serial
   Serial.print(pos1);
   Serial.print(",");
@@ -93,6 +98,9 @@ void loop() {
   Serial.print(",");
   Serial.print(peripheralControl);
   Serial.print("\n");
+  
+  // Return to low (receive)
+  digitalWrite(7, LOW);
 }
 
 void getJoystickValues() {
