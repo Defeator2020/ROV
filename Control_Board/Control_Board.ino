@@ -111,7 +111,7 @@ void getJoystickValues() {
   zbut = nunchuck_zbutton();     //  0 - 1
   cbut = nunchuck_cbutton();     //  0 - 1
 
-  // Adjust joystick range to -90 - 90
+  // Adjust joystick range to 0 - 180
   joyx = (joyx / 1.1) - 23;
   joyy = (joyy / 1.1) - 27;
   
