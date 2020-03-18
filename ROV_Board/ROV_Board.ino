@@ -17,7 +17,7 @@ float cameraRate = .125; // Rate adjust for thruster commands while in camera mo
 int thrusterNeutral = 90; // Identifies the neutral point for all thrusters, and will return to this value if anything erroneous happens
 
 // Create variables to manage the LED conditions and logic
-const int ledPin = 4;    // LED connected to digital pin 9
+const int ledPin = 4;    // LED connected to digital pin 4
 float ledValue = 180; // LED is inverted from usual
 const int ledMax = 255; // 0 - 255
 const int ledMin = 0; // 0 - 255
@@ -27,20 +27,22 @@ void setup() {
   thrusterL.attach(5,700,2000);
   thrusterR.attach(6,700,2000);
   thrusterV.attach(7,700,2000);
-  tiltCamera.attach(8);
+  tiltCamera.attach(9);
 
-  // Set output pin for enabling RS485 transmit
-  pinMode(7, OUTPUT);
+  // Set output pin for enabling RS485 transmit and laser control (respectively)
+  pinMode(3, OUTPUT);
+  pinMode(12, OUTPUT);
 
-  Serial.begin(9600); // Initialize serial communication
+  Serial.begin(1200); // Initialize serial communication
   
-  // Set serial board to low (receive)
+  // Set serial board to low (receive)and enable lasers (FOR TESTING)
   digitalWrite(7, LOW);
+  digitalWrite(12, HIGH);
   
   thrusterL.write(thrusterNeutral); // Sets all thrusters to their neutral points
   thrusterR.write(thrusterNeutral);
   thrusterV.write(thrusterNeutral);
-  tiltCamera.write(90); // Centers the camera vertically - FIGURE OUT WHAT VALUE THIS NEEDS TO BE< AND ADJUST STUFF ACCORDINGLY (MAKE THIS NEUTRAL JOYSTICK, TOO)
+  tiltCamera.write(80); // Centers the camera vertically - FIGURE OUT WHAT VALUE THIS NEEDS TO BE< AND ADJUST STUFF ACCORDINGLY (MAKE THIS NEUTRAL JOYSTICK, TOO)
 }
 
 void loop() {
@@ -71,7 +73,7 @@ void loop() {
           thrusterR.write(-pos1);
         } else {
           thrusterL.write(90);
-          thrusterR.write(90); // MAKE DEFAULT VARIABLE
+          thrusterR.write(90);
         }
         
         // Drive camera tilt mechanism

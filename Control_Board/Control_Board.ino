@@ -33,10 +33,10 @@ void setup() {
   pinMode(7, OUTPUT);
   
   // Open serial connection
-  Serial.begin(9600);
+  Serial.begin(1200);
   
   // Set serial board to low (receive)
-  digitalWrite(7, LOW);
+  digitalWrite(7, HIGH);
 }
 
 void loop() {
@@ -87,7 +87,7 @@ void loop() {
 
 void transmitData() { // Transmit data to the vehicle over serial
   // Set high to transmit
-  digitalWrite(7, HIGH);
+  // digitalWrite(7, HIGH);
   
   // Send those values over serial
   Serial.print(pos1);
@@ -100,7 +100,7 @@ void transmitData() { // Transmit data to the vehicle over serial
   Serial.print("\n");
   
   // Return to low (receive)
-  digitalWrite(7, LOW);
+  // digitalWrite(7, LOW);
 }
 
 void getJoystickValues() {
