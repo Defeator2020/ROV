@@ -33,7 +33,7 @@ void setup() {
   pinMode(7, OUTPUT);
   
   // Open serial connection
-  Serial.begin(1200);
+  Serial.begin(9600);
   
   // Set serial board to low (receive)
   digitalWrite(7, HIGH);
@@ -64,7 +64,8 @@ void loop() {
     pos2 = joyy;
     
     // Convert the positions back into the servo(and ESC)-friendly range of (0 - 180)
-    pos1 += 90;
+    pos1 += 90; // THIS IS BROKEN - ONLY 1 FIRES, AND IT'S NOT PROPORTIONAL
+    pos2 *= -1;
     pos2 += 90;
     
     if (cbut == 1 && zbut == 0) {

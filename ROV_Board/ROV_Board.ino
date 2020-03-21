@@ -33,7 +33,7 @@ void setup() {
   pinMode(3, OUTPUT);
   pinMode(12, OUTPUT);
 
-  Serial.begin(1200); // Initialize serial communication
+  Serial.begin(9600); // Initialize serial communication
   
   // Set serial board to low (receive)and enable lasers (FOR TESTING)
   digitalWrite(7, LOW);
