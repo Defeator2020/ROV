@@ -36,7 +36,7 @@ void setup() {
   Serial.begin(9600); // Initialize serial communication
   
   // Set serial board to low (receive)and enable lasers (FOR TESTING)
-  digitalWrite(7, LOW);
+  digitalWrite(3, LOW);
   digitalWrite(12, HIGH);
   
   thrusterL.write(thrusterNeutral); // Sets all thrusters to their neutral points
