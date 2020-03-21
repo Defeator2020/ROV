@@ -79,7 +79,7 @@ void loop() {
   } else {
     pos1 = 90;
     pos2 = 90;
-    pos3 = 0;
+    pos3 = 90;
   }
   
 	transmitData();
