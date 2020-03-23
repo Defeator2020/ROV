@@ -45,20 +45,20 @@ void loop() {
   // Check rotary selector position
   if (digitalRead(8) == LOW) {
     ratePercent = .5;
-    getJoystickValues();
+    getJoystickValues(1);
     calculateThrusters();
 
     adjustMotorRange();
     // Convert the positions back into the motor-friendly range
   } else if (digitalRead(9) == LOW) {
     ratePercent = .25;
-    getJoystickValues();
+    getJoystickValues(1);
     calculateThrusters();
 
     adjustMotorRange();
     // Convert the positions back into the motor-friendly range
   } else if (digitalRead(10) == LOW) {
-    getJoystickValues();
+    getJoystickValues(0);
 
     pos1 = joyx;
     pos2 = joyy;
@@ -104,7 +104,7 @@ void transmitData() { // Transmit data to the vehicle over serial
   // digitalWrite(7, LOW);
 }
 
-void getJoystickValues() {
+void getJoystickValues(deadZone) {
   // Poll and assign Nunchuck states to associated variables
   nunchuck_get_data();
   joyx = nunchuck_joyx();     //  15 - 221
@@ -120,12 +120,14 @@ void getJoystickValues() {
   joyx -= 90;
   joyy -= 90;
   
-  // Create joystick deadzone
-  if (joyx > -10 && joyx < 10) {
-    joyx = 0;
-  }
-  if (joyy > -10 && joyy < 10) {
-    joyy = 0;
+  if (deadZone == 1) {
+    // Create joystick deadzone
+    if (joyx > -10 && joyx < 10) {
+      joyx = 0;
+    }
+    if (joyy > -10 && joyy < 10) {
+      joyy = 0;
+    }
   }
   
   // Constrain joystick range to -90 - 90

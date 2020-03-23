@@ -82,7 +82,7 @@ void loop() {
         // Convert vertical value for use as LED control
         pos3 = constrain(pos3, -1, 1);
         
-        ledValue += -pos3; // // - is needed because the PWM controller is inverted (255(ish) = min, 0(ish) = max)
+        ledValue += -pos3; // - is needed because the PWM controller is inverted (255(ish) = min, 0(ish) = max)
         ledValue = constrain(ledValue, ledMin, ledMax);
         analogWrite(ledPin, ledValue);
         delay(10);
