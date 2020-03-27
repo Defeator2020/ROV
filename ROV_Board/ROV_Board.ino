@@ -35,9 +35,9 @@ void setup() {
 
   Serial.begin(9600); // Initialize serial communication
   
-  // Set serial board to low (receive)and enable lasers (FOR TESTING)
+  // Set serial board to low (receive)and disengage lasers
   digitalWrite(3, LOW);
-  digitalWrite(12, HIGH);
+  digitalWrite(12, LOW);
   
   thrusterL.write(thrusterNeutral); // Sets all thrusters to their neutral points
   thrusterR.write(thrusterNeutral);
@@ -63,10 +63,10 @@ void loop() {
         
       } else if (peripheralControl == 1) {
         // Use x-axis to control pivoting in camera mode
-        if (pos1 < 90) {
-          pos1 = (pos1 - 90) * cameraRate;
-          thrusterL.write(pos1);
-          thrusterR.write(-pos1);
+        if (pos1 < 90) { // THIS IS BROKEN - ONLY 1 FIRES, AND IT'S NOT PROPORTIONAL
+          pos1 = (90 - pos1) * cameraRate;
+          thrusterL.write(-pos1);
+          thrusterR.write(pos1);
         } else if (pos1 > 90) {
           pos1 = (pos1 - 90) * cameraRate;
           thrusterL.write(pos1);
@@ -75,17 +75,33 @@ void loop() {
           thrusterL.write(90);
           thrusterR.write(90);
         }
+
+        pos2 -= 10; // Lower resting value to level camera
+        pos2 = constrain(pos2, 55, 115); // Constrain camera values to available tilt range - MAYBE SPREAD OUT TO TAKE UP FULL JOYSTICK RANGE AT SOME POINT?
         
         // Drive camera tilt mechanism
         tiltCamera.write(pos2);
 
         // Convert vertical value for use as LED control
-        pos3 = constrain(pos3, -1, 1);
-        
+        pos3 = constrain(pos3, -1, 1); // IS THIS EVEN NECESSARY?
+
+        /* NOT USING RIGHT NOW - LED IS DISABLED
         ledValue += -pos3; // - is needed because the PWM controller is inverted (255(ish) = min, 0(ish) = max)
         ledValue = constrain(ledValue, ledMin, ledMax);
         analogWrite(ledPin, ledValue);
         delay(10);
+        */
+
+        if (pos3 == 1) {
+          digitalWrite(12, HIGH);
+        } else {
+          digitalWrite(12, LOW);
+        } 
+        if (pos3 == -1) {
+          thrusterV.write(95);
+        } else {
+          thrusterV.write(90);
+        }
         
       } else if (peripheralControl == 2) {
         // PUT CODE FOR MANIPULATOR / SAMPLING INSTRUMENTS HERE

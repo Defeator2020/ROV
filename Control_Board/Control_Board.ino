@@ -5,9 +5,9 @@
 float joyx, joyy, zbut, cbut;
 
 // Create variables to store the various motor and servo states and turning / rate parameters
-int pos1 = 0;
-int pos2 = 0;
-int pos3 = 0;
+int pos1 = 90;
+int pos2 = 90;
+int pos3 = 90;
 int pivotSpeed; // Pivot Speed (-90 - 90)
 float pivotScale; // Balance scale between drive (turn) and pivot (0 - 1)
 float pivotYlimit = 23; // The threshold where pivoting begins, in units of the distance on the y-axis from the x-axis. Higher = more range maps to pivoting (0 - 90)
@@ -36,7 +36,7 @@ void setup() {
   Serial.begin(9600);
   
   // Set serial board to low (receive)
-  digitalWrite(7, HIGH);
+  digitalWrite(7, HIGH); // HIGH (RECEIVE-ONLY) FOR TESTING
 }
 
 void loop() {
@@ -46,6 +46,7 @@ void loop() {
   if (digitalRead(8) == LOW) {
     ratePercent = .5;
     getJoystickValues(1);
+    pos3 *= 90; //Adjusts vertical thruster value to have magnitude
     calculateThrusters();
 
     adjustMotorRange();
@@ -53,6 +54,7 @@ void loop() {
   } else if (digitalRead(9) == LOW) {
     ratePercent = .25;
     getJoystickValues(1);
+    pos3 *= 90; //Adjusts vertical thruster value to have magnitude
     calculateThrusters();
 
     adjustMotorRange();
@@ -64,10 +66,11 @@ void loop() {
     pos2 = joyy;
     
     // Convert the positions back into the servo(and ESC)-friendly range of (0 - 180)
-    pos1 += 90; // THIS IS BROKEN - ONLY 1 FIRES, AND IT'S NOT PROPORTIONAL
+    pos1 += 90;
     pos2 *= -1;
     pos2 += 90;
-    
+
+    // Calculate 3rd motor value (pos3)
     if (cbut == 1 && zbut == 0) {
       pos3 = 1;
     } else if (cbut == 0 && zbut == 1) {
@@ -75,8 +78,11 @@ void loop() {
     } else {
       pos3 = 0;
     }
-    
+
     peripheralControl = 1;
+  } else if (digitalRead(11) == LOW) {
+    // PUT CODE FOR MANIPULATOR / SAMPLING INSTRUMENTS HERE
+    
   } else {
     pos1 = 90;
     pos2 = 90;
@@ -104,7 +110,7 @@ void transmitData() { // Transmit data to the vehicle over serial
   // digitalWrite(7, LOW);
 }
 
-void getJoystickValues(deadZone) {
+void getJoystickValues(int deadZone) {
   // Poll and assign Nunchuck states to associated variables
   nunchuck_get_data();
   joyx = nunchuck_joyx();     //  15 - 221
@@ -187,9 +193,9 @@ void calculateThrusters() {
 
   // Calculate 3rd motor value (pos3)
   if (cbut == 1 && zbut == 0) {
-    pos3 = 45; // FIGURE OUT WHAT VERTICAL RATES SHOULD BE, AND ADJUST LIMITS HERE -- MAYBE BIND TO A VARIABLE UP TOP
+    pos3 = 90;
   } else if (cbut == 0 && zbut == 1) {
-    pos3 = -45;
+    pos3 = -90;
   } else {
     pos3 = 0;
   }
@@ -197,5 +203,5 @@ void calculateThrusters() {
   // Adjust values based on current rate setting
   pos1 = pos1 * ratePercent;
   pos2 = pos2 * ratePercent;
-  pos3 = pos3 * (ratePercent * .5); // Vertical thruster set to run at half the speed of the other ones
+  pos3 = pos3 * (ratePercent * .25); // Vertical thruster set to run at one quarter the speed of the other ones
 }
