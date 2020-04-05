@@ -63,18 +63,8 @@ void loop() {
         
       } else if (peripheralControl == 1) {
         // Use x-axis to control pivoting in camera mode
-        if (pos1 < 90) { // THIS IS BROKEN - ONLY 1 FIRES, AND IT'S NOT PROPORTIONAL
-          pos1 = (90 - pos1) * cameraRate;
-          thrusterL.write(-pos1);
-          thrusterR.write(pos1);
-        } else if (pos1 > 90) {
-          pos1 = (pos1 - 90) * cameraRate;
-          thrusterL.write(pos1);
-          thrusterR.write(-pos1);
-        } else {
-          thrusterL.write(90);
-          thrusterR.write(90);
-        }
+        thrusterL.write(constrain(pos1 + 90, 0, 180));
+        thrusterR.write(constrain(pos2 + 90, 0, 180));
 
         pos2 -= 10; // Lower resting value to level camera
         pos2 = constrain(pos2, 55, 115); // Constrain camera values to available tilt range - MAYBE SPREAD OUT TO TAKE UP FULL JOYSTICK RANGE AT SOME POINT?

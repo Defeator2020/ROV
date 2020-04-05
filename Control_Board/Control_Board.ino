@@ -66,7 +66,7 @@ void loop() {
     pos2 *= -1;
     pos2 += 90;
 
-    // Calculate 3rd motor value (pos3)
+    // Send value for LED control
     if (cbut == 1 && zbut == 0) {
       pos3 = 1;
     } else if (cbut == 0 && zbut == 1) {
@@ -148,7 +148,6 @@ void adjustMotorRange() {
   pos1 += 90; // Move the adjusted values up into the (0 - 180) range
   pos2 += 90;
   pos3 += 90;
-  
 }
 
 void calculateThrusters() {
