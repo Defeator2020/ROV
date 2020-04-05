@@ -44,7 +44,7 @@ void loop() {
   
   // Check rotary selector position
   if (digitalRead(8) == LOW) {
-    ratePercent = .5;
+    ratePercent = 1;
     getJoystickValues(1);
     pos3 *= 90; //Adjusts vertical thruster value to have magnitude
     calculateThrusters();
@@ -203,5 +203,5 @@ void calculateThrusters() {
   // Adjust values based on current rate setting
   pos1 = pos1 * ratePercent;
   pos2 = pos2 * ratePercent;
-  pos3 = pos3 * (ratePercent * .25); // Vertical thruster set to run at one quarter the speed of the other ones
+  pos3 = pos3 * ratePercent;
 }
