@@ -46,19 +46,15 @@ void loop() {
   if (digitalRead(8) == LOW) {
     ratePercent = 1;
     getJoystickValues(1);
-    pos3 *= 90; //Adjusts vertical thruster value to have magnitude
     calculateThrusters();
 
     adjustMotorRange();
-    // Convert the positions back into the motor-friendly range
   } else if (digitalRead(9) == LOW) {
     ratePercent = .25;
     getJoystickValues(1);
-    pos3 *= 90; //Adjusts vertical thruster value to have magnitude
     calculateThrusters();
 
     adjustMotorRange();
-    // Convert the positions back into the motor-friendly range
   } else if (digitalRead(10) == LOW) {
     getJoystickValues(0);
 
