@@ -63,8 +63,8 @@ void loop() {
         
       } else if (peripheralControl == 1) {
         // Use x-axis to control pivoting in camera mode
-        thrusterL.write(constrain(pos1 + 90, 0, 180));
-        thrusterR.write(constrain(pos2 + 90, 0, 180));
+        //thrusterL.write(constrain(pos1 + 90, 0, 180)); - THIS IT TOTALLY BROKEN!!!
+        //thrusterR.write(constrain(pos2 + 90, 0, 180));
 
         pos2 -= 10; // Lower resting value to level camera
         pos2 = constrain(pos2, 55, 115); // Constrain camera values to available tilt range - MAYBE SPREAD OUT TO TAKE UP FULL JOYSTICK RANGE AT SOME POINT?
@@ -92,6 +92,10 @@ void loop() {
         } else {
           thrusterV.write(90);
         }
+
+        // Write neutral values to the thrusters in order to prevent any... weirdness
+        thrusterL.write(thrusterNeutral);
+        thrusterR.write(thrusterNeutral);
         
       } else if (peripheralControl == 2) {
         // PUT CODE FOR MANIPULATOR / SAMPLING INSTRUMENTS HERE
