@@ -12,6 +12,7 @@ int pivotSpeed; // Pivot Speed (-90 - 90)
 float pivotScale; // Balance scale between drive (turn) and pivot (0 - 1)
 float pivotYlimit = 23; // The threshold where pivoting begins, in units of the distance on the y-axis from the x-axis. Higher = more range maps to pivoting (0 - 90)
 
+int thrusterNeutral = 90; // Neutral (default) value for the thrusters (primarily used for error codes) 
 float ratePercent = 1; // Adjusts speed of motors based on rotary selector position (0 - 1)
 int thrusterMinValue = 0; // Sets minimum throttle level for ESC - REMEMBER TO SET PRIOR TO TESTING (0 - 180)
 int thrusterMaxValue = 180; // Sets maximum throttle level for ESC - REMEMBER TO SET PRIOR TO TESTING (0 - 180)
@@ -21,7 +22,7 @@ int peripheralControl = 0; // Tells the ROV's Arduino if the values are for the 
 void setup() {
   // Initialize Nunchuck
   nunchuck_setpowerpins();
-  nunchuck_init(); // send the initilization handshake
+  nunchuck_init(); // Send the initilization handshake
 
   // Set pins connected to rotary selector to inputs
   pinMode(8, INPUT_PULLUP);
@@ -36,7 +37,7 @@ void setup() {
   Serial.begin(9600);
   
   // Set serial board to low (receive)
-  digitalWrite(7, HIGH); // HIGH (RECEIVE-ONLY) FOR TESTING
+  digitalWrite(7, HIGH); // LOCKED TO HIGH (RECEIVE-ONLY) FOR TESTING
 }
 
 void loop() {
@@ -61,9 +62,9 @@ void loop() {
     pos1 = joyx;
     pos2 = joyy;
     
-    // Convert the positions back into the servo(and ESC)-friendly range of (0 - 180)
+    // Convert the positions back into the servo (and ESC)-friendly range of (0 - 180)
     pos1 += 90;
-    pos2 *= -1;
+    pos2 *= -1; // This inverts this one so that it move the camera the correct direction... worth moving it to the sub or elsewhere in this code, perhaps?
     pos2 += 90;
 
     // Send value for LED control
@@ -79,10 +80,10 @@ void loop() {
   } else if (digitalRead(11) == LOW) {
     // PUT CODE FOR MANIPULATOR / SAMPLING INSTRUMENTS HERE
     
-  } else {
-    pos1 = 90;
-    pos2 = 90;
-    pos3 = 90;
+  } else { // Error default
+    pos1 = thrusterNeutral;
+    pos2 = thrusterNeutral;
+    pos3 = thrusterNeutral;
   }
   
 	transmitData();
@@ -115,10 +116,10 @@ void getJoystickValues(int deadZone) {
   cbut = nunchuck_cbutton();     //  0 - 1
 
   // Adjust joystick range to 0 - 180
-  joyx = (joyx / 1.1) - 23;
-  joyy = (joyy / 1.1) - 27;
+  joyx = (joyx / 1.1) - 23; // Might be worth checking this bit here at some point
+  joyy = (joyy / 1.1) - 27; // (and this)
   
-  // Lower joystick values into correct range
+  // Lower joystick values into correct range for easy manipulation (-90 - 90)
   joyx -= 90;
   joyy -= 90;
   
@@ -145,7 +146,7 @@ void adjustMotorRange() {
   pos2 *= rangeAdjust;
   pos3 *= rangeAdjust;
   
-  pos1 += 90; // Move the adjusted values up into the (0 - 180) range
+  pos1 += 90; // Move the adjusted values up into the (0 - 180) range (centered on 90)
   pos2 += 90;
   pos3 += 90;
 }
@@ -188,9 +189,9 @@ void calculateThrusters() {
 
   // Calculate 3rd motor value (pos3)
   if (cbut == 1 && zbut == 0) {
-    pos3 = 90;
+    pos3 = 89; // Not full 90 to try and resolve the no down thruster on full rate setting
   } else if (cbut == 0 && zbut == 1) {
-    pos3 = -90;
+    pos3 = -89; // Not full 90 to try and resolve the no down thruster on full rate setting
   } else {
     pos3 = 0;
   }

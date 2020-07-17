@@ -39,10 +39,10 @@ void setup() {
   digitalWrite(3, LOW);
   digitalWrite(12, LOW);
   
-  thrusterL.write(thrusterNeutral); // Sets all thrusters to their neutral points
+  thrusterL.write(thrusterNeutral); // Sets all thrusters (and the camera) to their neutral points
   thrusterR.write(thrusterNeutral);
   thrusterV.write(thrusterNeutral);
-  tiltCamera.write(80); // Centers the camera vertically - FIGURE OUT WHAT VALUE THIS NEEDS TO BE< AND ADJUST STUFF ACCORDINGLY (MAKE THIS NEUTRAL JOYSTICK, TOO)
+  tiltCamera.write(80);
 }
 
 void loop() {
@@ -72,8 +72,8 @@ void loop() {
         // Drive camera tilt mechanism
         tiltCamera.write(pos2);
 
-        // Convert vertical value for use as LED control
-        pos3 = constrain(pos3, -1, 1); // IS THIS EVEN NECESSARY?
+        // Convert vertical value for use as some peripheral control (change when adding LED control) -> maybe best to have it just be, like, 3 or 4 preset values that are cycled between!!!!!
+        pos3 = constrain(pos3, -1, 1); // IS THIS EVEN NECESSARY? Probably not, but it can't really hurt.
 
         /* NOT USING RIGHT NOW - LED IS DISABLED
         ledValue += -pos3; // - is needed because the PWM controller is inverted (255(ish) = min, 0(ish) = max)
