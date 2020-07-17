@@ -1,5 +1,5 @@
 #include <Wire.h>
-#include <nunchuck_funcs.h>
+#include "nunchuck_funcs.h"
 
 // Initialize variables for storing the Nunchuck's state
 float joyx, joyy, zbut, cbut;
