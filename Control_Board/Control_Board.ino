@@ -189,7 +189,7 @@ void calculateThrusters() {
   pos1 = (1 - pivotScale) * pos1 + pivotScale * (pivotSpeed);
   pos2 = (1 - pivotScale) * pos2 + pivotScale * (-pivotSpeed);
 
-  // Calculate 3rd motor value (pos3)
+  // Calculate 3rd motor value (pos3) - MAKE THIS A RANGE CONSTRAINT AT SOME POINT (PROBABLY EASIER TO TUNE/MANAGE)
   if (cbut == 1 && zbut == 0) {
     pos3 = verticalThrusterMax - 90; // Not full 90 to try and resolve the no down thruster on full rate setting
   } else if (cbut == 0 && zbut == 1) {
