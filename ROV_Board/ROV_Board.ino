@@ -17,9 +17,10 @@ float cameraRate = .125; // Rate adjust for thruster commands while in camera mo
 int thrusterNeutral = 90; // Identifies the neutral point for all thrusters, and will return to this value if anything erroneous happens
 
 // Create variables to manage the LED conditions and logic
-const int ledPin = 4;    // LED connected to digital pin 4
+const int ledPin = 3;    // LED control transistor is connected to digital pin 3
+int ledChangeRate = 1; // Dictates the rate at which the lateral joystick will shift the LED brightness when in camera mode
 float ledValue = 180; // LED is inverted from usual
-const int ledMax = 255; // 0 - 255
+const int ledMax = 200; // 0 - 255
 const int ledMin = 0; // 0 - 255
 
 void setup() {
@@ -36,13 +37,13 @@ void setup() {
   Serial.begin(9600); // Initialize serial communication
   
   // Set serial board to low (receive)and disengage lasers
-  digitalWrite(3, LOW);
   digitalWrite(12, LOW);
   
   thrusterL.write(thrusterNeutral); // Sets all thrusters (and the camera) to their neutral points
   thrusterR.write(thrusterNeutral);
   thrusterV.write(thrusterNeutral);
   tiltCamera.write(80);
+  analogWrite(ledPin, ledValue);
 }
 
 void loop() {
@@ -62,37 +63,38 @@ void loop() {
         thrusterV.write(pos3);
         
       } else if (peripheralControl == 1) {
-        // Use x-axis to control pivoting in camera mode
-        //thrusterL.write(constrain(pos1 + 90, 0, 180)); - THIS IT TOTALLY BROKEN!!!
-        //thrusterR.write(constrain(pos2 + 90, 0, 180));
-
-        pos2 -= 10; // Lower resting value to level camera
-        pos2 = constrain(pos2, 55, 115); // Constrain camera values to available tilt range - MAYBE SPREAD OUT TO TAKE UP FULL JOYSTICK RANGE AT SOME POINT?
+        // Use vertical joystick to control camera
+        if (pos2 < 85 or pos2 > 95) {
+          pos2 -= 10; // Lower resting value to level camera
+          pos2 = constrain(pos2, 55, 115); // Constrain camera values to available tilt range - MAYBE SPREAD OUT TO TAKE UP FULL JOYSTICK RANGE AT SOME POINT?
+        } else {
+          pos2 = 80;
+        }
         
         // Drive camera tilt mechanism
         tiltCamera.write(pos2);
 
-        // Convert vertical value for use as some peripheral control (change when adding LED control) -> maybe best to have it just be, like, 3 or 4 preset values that are cycled between!!!!!
+        // Ensures that 'pos3' commands are within expected range (-1, 1, or 0) - RESTRICT TO ONLY THOSE VALUES?
         pos3 = constrain(pos3, -1, 1); // IS THIS EVEN NECESSARY? Probably not, but it can't really hurt.
 
-        /* NOT USING RIGHT NOW - LED IS DISABLED
-        ledValue += -pos3; // - is needed because the PWM controller is inverted (255(ish) = min, 0(ish) = max)
+        // Use lateral joystick to control the LED brightness
+        if (pos1 > 100) {
+          ledValue += ledChangeRate;
+        } else if (pos1 < 80) {
+          ledValue -= ledChangeRate;
+        }
+        
+        // Update written LED value as was updated above
         ledValue = constrain(ledValue, ledMin, ledMax);
         analogWrite(ledPin, ledValue);
-        delay(10);
-        */
 
+        // Engage lasers on Nunchuck "c" key press
         if (pos3 == 1) {
           digitalWrite(12, HIGH);
         } else {
           digitalWrite(12, LOW);
         } 
-        if (pos3 == -1) {
-          thrusterV.write(95);
-        } else {
-          thrusterV.write(90);
-        }
-
+        
         // Write neutral values to the thrusters in order to prevent any... weirdness
         thrusterL.write(thrusterNeutral);
         thrusterR.write(thrusterNeutral);
