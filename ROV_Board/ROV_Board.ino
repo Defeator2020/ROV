@@ -48,69 +48,66 @@ void setup() {
 
 void loop() {
   // If there's any serial available, read it
-  while (Serial.available() > 0) {
+  while (Serial.available()) { // THIS SHOULD HAVE ERROR CHECKING, TO DEAL WITH INCOMING NOT MATCHING SENT (also should be assigned to list, then broken back apart, probably, so I can just run this inside of a "while(Available)" loop)
     int pos1 = Serial.parseInt(); // Look for the next valid integer in the incoming serial stream
     int pos2 = Serial.parseInt(); // Do it again
     int pos3 = Serial.parseInt(); // Do it again
     int peripheralControl = Serial.parseInt(); // Do it again
 
-    // Look for the newline. That marks the end of the sentence
-    if (Serial.read() == '\n') {
-      if (peripheralControl == 0) {
-        // Write the servo position(s) to the servo(s)
-        thrusterL.write(pos1);
-        thrusterR.write(pos2);
-        thrusterV.write(pos3);
+    if (peripheralControl == 0) {
+      // Write the servo position(s) to the servo(s)
+      thrusterL.write(pos1);
+      thrusterR.write(pos2);
+      thrusterV.write(pos3);
         
-      } else if (peripheralControl == 1) {
-        // Use vertical joystick to control camera
-        if (pos2 < 85 or pos2 > 95) {
-          pos2 -= 10; // Lower resting value to level camera
-          pos2 = constrain(pos2, 55, 115); // Constrain camera values to available tilt range - MAYBE SPREAD OUT TO TAKE UP FULL JOYSTICK RANGE AT SOME POINT?
-        } else {
-          pos2 = 80;
-        }
-        
-        // Drive camera tilt mechanism
-        tiltCamera.write(pos2);
-
-        // Ensures that 'pos3' commands are within expected range (-1, 1, or 0) - RESTRICT TO ONLY THOSE VALUES?
-        pos3 = constrain(pos3, -1, 1); // IS THIS EVEN NECESSARY? Probably not, but it can't really hurt.
-
-        // Use lateral joystick to control the LED brightness
-        if (pos1 > 100) {
-          ledValue += ledChangeRate;
-        } else if (pos1 < 80) {
-          ledValue -= ledChangeRate;
-        }
-        
-        // Update written LED value as was updated above
-        ledValue = constrain(ledValue, ledMin, ledMax);
-        analogWrite(ledPin, ledValue);
-
-        // Engage lasers on Nunchuck "c" key press
-        if (pos3 == 1) {
-          digitalWrite(12, HIGH);
-        } else {
-          digitalWrite(12, LOW);
-        } 
-        
-        // Write neutral values to the thrusters in order to prevent any... weirdness
-        thrusterL.write(thrusterNeutral);
-        thrusterR.write(thrusterNeutral);
-        
-      } else if (peripheralControl == 2) {
-        // PUT CODE FOR MANIPULATOR / SAMPLING INSTRUMENTS HERE
-        
-      } else { // Error state - zero all thrusters
-        thrusterL.write(thrusterNeutral);
-        thrusterR.write(thrusterNeutral);
-        thrusterV.write(thrusterNeutral);
+    } else if (peripheralControl == 1) {
+      // Use vertical joystick to control camera
+      if (pos2 < 85 or pos2 > 95) {
+        pos2 -= 10; // Lower resting value to level camera
+        pos2 = constrain(pos2, 55, 115); // Constrain camera values to available tilt range - MAYBE SPREAD OUT TO TAKE UP FULL JOYSTICK RANGE AT SOME POINT?
+      } else {
+        pos2 = 80;
       }
+        
+      // Drive camera tilt mechanism
+      tiltCamera.write(pos2);
+
+      // Ensures that 'pos3' commands are within expected range (-1, 1, or 0) - RESTRICT TO ONLY THOSE VALUES?
+      pos3 = constrain(pos3, -1, 1); // IS THIS EVEN NECESSARY? Probably not, but it can't really hurt.
+
+      // Use lateral joystick to control the LED brightness
+      if (pos1 > 100) {
+        ledValue += ledChangeRate;
+      } else if (pos1 < 80) {
+        ledValue -= ledChangeRate;
+      }
+        
+      // Update written LED value as was updated above
+      ledValue = constrain(ledValue, ledMin, ledMax);
+      analogWrite(ledPin, ledValue);
+
+      // Engage lasers on Nunchuck "c" key press
+      if (pos3 == 1) {
+        digitalWrite(12, HIGH);
+      } else {
+        digitalWrite(12, LOW);
+      } 
+        
+      // Write neutral values to the thrusters in order to prevent any... weirdness
+      thrusterL.write(thrusterNeutral);
+      thrusterR.write(thrusterNeutral);
+        
+    } else if (peripheralControl == 2) {
+      // PUT CODE FOR MANIPULATOR / SAMPLING INSTRUMENTS HERE
+        
     } else { // Error state - zero all thrusters
       thrusterL.write(thrusterNeutral);
       thrusterR.write(thrusterNeutral);
       thrusterV.write(thrusterNeutral);
     }
+  } else { // Error state - zero all thrusters
+      thrusterL.write(thrusterNeutral);
+      thrusterR.write(thrusterNeutral);
+      thrusterV.write(thrusterNeutral);
   }
 }
