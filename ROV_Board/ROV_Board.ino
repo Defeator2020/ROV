@@ -27,7 +27,7 @@ void setup() {
   // Attach the thrusters and servos to their respective pins
   thrusterL.attach(5,700,2000);
   thrusterR.attach(6,700,2000);
-  thrusterV.attach(7,700,2000);
+  thrusterV.attach(7,1000,2000);
   tiltCamera.attach(9);
 
   // Set output pin for enabling RS485 transmit and laser control (respectively)
